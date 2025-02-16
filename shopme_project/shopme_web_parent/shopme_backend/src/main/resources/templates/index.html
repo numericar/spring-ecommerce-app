@@ -1,11 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopme Control Panal</title>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.js}"></script>
 </head>
 <body>
-    <h1>Hello from Spring Server!</h1>
+    <div class="container">
+        <div>
+            <h1>Shopme Control Panel</h1>
+        </div>
+        <div>
+            <p>Shopme Control Panel - Copyright &copy; Shopme</p>
+        </div>
+    </div>
 </body>
 </html>

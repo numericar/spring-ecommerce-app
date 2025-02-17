@@ -22,6 +22,10 @@ public class Role {
     @Column(name = "role_description", length = 150, nullable = false)
     private String description;
 
+    public Role() {
+
+    }
+
     public Role(String name, String description) {
         this.name = name;
         this.description = description;
@@ -51,4 +55,8 @@ public class Role {
         this.description = description;
     }
 
+    @Override
+    public String toString() {
+        return "Role [name=" + name + "]";
+    }
 }

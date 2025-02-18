@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{commons/head :: head}"></head>
+
+<body>
+    <div th:replace="~{commons/navbar :: navbar}"></div>
+
+    <div class="container-fluid">
+            <h2 class="text-center">Create user</h2>
+            <div class="d-flex justify-content-center align-items-center w-100">
+                <form th:action="@{/users/create}" method="post" class="w-25" th:object="${user}">
+                    <div class="form">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" id="email" class="form-control w-100" th:field="*{email}" required minlength="8" maxlength="128">
+                        </div>
+                        <div class="mb-3">
+                            <label for="firstName" class="form-label">First Name</label>
+                            <input type="text" id="firstName" class="form-control w-100" th:field="*{firstName}" required minlength="1" maxlength="128">
+                        </div>
+                        <div class="mb-3">
+                            <label for="lastName" class="form-label">Last Name</label>
+                            <input type="text" id="lastName" class="form-control w-100" th:field="*{lastName}" required minlength="1" maxlength="128">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" id="password" class="form-control w-100" th:field="*{password}" required>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-danger">Cancel</button>
+                            <button type="submit" class="btn btn-success">Create</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+    </div>
+
+    <div class="container">
+        <p>Shopme Control Panel - Copyright &copy; Shopme</p>
+    </div>
+</body>
+
+</html>

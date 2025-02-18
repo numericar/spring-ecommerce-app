@@ -7,8 +7,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.shopme.entities.Role;
 import com.shopme.entities.User;
+import com.shopme.services.RoleService;
 import com.shopme.services.UserService;
 
 @Controller
@@ -16,9 +19,11 @@ import com.shopme.services.UserService;
 public class UserController {
 
     private UserService userService;
-    
-    public UserController(UserService userService) {
+    private RoleService roleService;
+        
+    public UserController(UserService userService, RoleService roleService) {
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     // Model เป็น interface ที่ใช้ในการส่งข้อมูลไปยัง view
@@ -34,16 +39,23 @@ public class UserController {
 
     @GetMapping("/create")
     public String viewCreatePage(Model model) {
+        // 
         User user = new User();
-
         model.addAttribute("user", user);
+
+        Iterable<Role> roles = this.roleService.findAll();
+        model.addAttribute("roles", roles);
 
         return "users/user_form";
     }
 
     @PostMapping("/create")
-    public String createUser(User user) {
+    public String createUser(User user, RedirectAttributes redirectAttributes) {
         System.out.println(user.toString());
+        this.userService.save(user);
+
+        redirectAttributes.addFlashAttribute("message", "The user has been successfully");
+
         return "redirect:/users";
     }
 

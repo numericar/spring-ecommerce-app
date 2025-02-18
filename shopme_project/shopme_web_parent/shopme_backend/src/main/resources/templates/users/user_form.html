@@ -27,8 +27,22 @@
                             <label for="password" class="form-label">Password</label>
                             <input type="password" id="password" class="form-control w-100" th:field="*{password}" required>
                         </div>
+                        <div class="mb-3">
+                            <div class="btn-group" role="group">
+                                <th:block th:each="role : ${roles}">
+                                    <input type="checkbox" name="roles" th:value="${role.id}" class="btn-check" th:id="'role-' + ${role.id}" th:checked="${#lists.contains(user.roles, role.id)}" autocomplete="off">
+                                    <label th:text="${role.name}" class="btn btn-outline-secondary" th:for="'role-' + ${role.id}"></label>
+                                </th:block>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="btn-group" role="group">
+                                <input type="checkbox" name="enabled" th:checked="*{enabled}" id="enabled" class="btn-check">
+                                <label for="enabled" class="btn btn-outline-secondary">Enable</label>
+                            </div>
+                        </div>
                         <div class="d-flex justify-content-between">
-                            <button type="button" class="btn btn-outline-danger">Cancel</button>
+                            <button type="button" class="btn btn-outline-danger" onclick="redirectToUserIndexPage()">Cancel</button>
                             <button type="submit" class="btn btn-success">Create</button>
                         </div>
                     </div>
@@ -39,6 +53,12 @@
     <div class="container">
         <p>Shopme Control Panel - Copyright &copy; Shopme</p>
     </div>
+
+    <script>
+        function redirectToUserIndexPage() {
+            window.location = "[[@{/users}]]";
+        }
+    </script>
 </body>
 
 </html>

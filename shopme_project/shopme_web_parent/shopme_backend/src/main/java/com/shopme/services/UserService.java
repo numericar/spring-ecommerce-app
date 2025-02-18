@@ -6,4 +6,5 @@ import com.shopme.entities.User;
 
 public interface UserService {
     List<User> findAll();
+    void save(User user);
 }

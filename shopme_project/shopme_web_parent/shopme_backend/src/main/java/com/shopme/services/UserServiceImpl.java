@@ -21,4 +21,9 @@ public class UserServiceImpl implements UserService {
         // (List<User>) ใช้ในการ cast ค่าที่ได้จาก method findAll() ให้กลายเป็น List<User> โดยที่ method findAll() จะ return ค่าเป็น Iterable<User>
         return (List<User>) userRepo.findAll();
     }
+
+    @Override
+    public void save(User user) {
+        this.userRepo.save(user);
+    }
 }

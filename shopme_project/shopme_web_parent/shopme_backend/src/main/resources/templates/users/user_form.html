@@ -9,7 +9,7 @@
     <div class="container-fluid">
             <h2 class="text-center">Create user</h2>
             <div class="d-flex justify-content-center align-items-center w-100">
-                <form th:action="@{/users/create}" method="post" class="w-25" th:object="${user}">
+                <form th:action="@{/users/create}" method="post" class="w-25" th:object="${user}" onsubmit="return checkEmailUnique(this)">
                     <div class="form">
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
@@ -57,6 +57,31 @@
     <script>
         function redirectToUserIndexPage() {
             window.location = "[[@{/users}]]";
+        }
+
+        function checkEmailUnique(form) {
+            let email = document.getElementById("email").value;
+            let csrf = document.getElementsByName("_csrf")[0].value; // อ่าน token จาก input hidden ที่ชื่อ _csrf
+            let url = "[[@{/api/users/check_email_unique}]]?email=" + email;
+
+            fetch(url, {
+                method: "post",
+                headers: {
+                    "X-CSRF-TOKEN": csrf
+                }
+                
+            }).then((data) => {
+                return data.text();
+            }).then((data) => {
+                console.log(data);
+                if (data === "OK") {
+                    form.submit();
+                } else {
+                    alert("Email is duplicated");
+                }
+            });
+
+            return false;
         }
     </script>
 </body>

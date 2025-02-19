@@ -19,7 +19,7 @@ public class UserRestController {
 
     // @Param ใช้ในการรับค่า parameter ที่ส่งมาจาก client ผ่าน URL เช่น /check_email?email=xxx
     @PostMapping("/check_email_unique")
-    public String checkEmailUnique(@RequestParam("email") String email, @RequestParam("id") Integer id) {
+    public String checkEmailUnique(@RequestParam("email") String email, @RequestParam(value = "id", required = false) Integer id) {
 
         return this.userService.isEmailUnique(email, id) ? "OK" : "Duplicated";
     }

@@ -10,4 +10,5 @@ public interface UserService {
     void save(User user);
     boolean isEmailUnique(String email, Integer id);
     Optional<User> findById(Integer id);
+    void delete(Integer id);
 }

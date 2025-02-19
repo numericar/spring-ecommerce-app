@@ -66,7 +66,14 @@
             let email = document.getElementById("email").value;
             let csrf = document.getElementsByName("_csrf")[0].value; // อ่าน token จาก input hidden ที่ชื่อ _csrf
             let userId = document.getElementById("id").value;
-            let url = "[[@{/api/users/check_email_unique}]]?email=" + email + "&id=" + userId;
+
+            console.log(typeof userId);
+
+            let url = "[[@{/api/users/check_email_unique}]]?email=" + email;
+
+            if (userId.length > 0) {
+                url += "&id=" + userId;
+            }
 
             fetch(url, {
                 method: "post",

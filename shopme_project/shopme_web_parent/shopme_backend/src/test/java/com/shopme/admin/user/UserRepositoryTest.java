@@ -93,4 +93,12 @@ public class UserRepositoryTest {
 
         assertTrue(userOptinal.isPresent()); // ตรวจสอบว่ามีข้อมูลหรือไม่ ถ้ามีจะ return true
     }
+
+    @Test
+    public void testCountById() {
+        Integer id = 6;
+        Long countById = this.repo.countById(id);
+
+        assertTrue(countById == 1);
+    }
 }

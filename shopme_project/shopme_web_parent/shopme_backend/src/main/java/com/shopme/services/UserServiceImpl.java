@@ -68,4 +68,15 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findById(Integer id) {
         return this.userRepo.findById(id);
     }
+
+    @Override
+    public void delete(Integer id) {
+        Long count = this.userRepo.countById(id);
+        
+        if (count == null || count == 0) {
+            throw new RuntimeException("Could not find any user with ID " + id);
+        }
+
+        this.userRepo.deleteById(id);
+    }
 }

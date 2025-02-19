@@ -9,7 +9,13 @@
     <div class="container-fluid">
             <h2 class="text-center" th:text="${pageTitle}"></h2>
             <div class="d-flex justify-content-center align-items-center w-100">
-                <form th:action="@{/users/create}" method="post" class="w-25" th:object="${user}" onsubmit="return checkEmailUnique(this)">
+                <form 
+                    th:action="@{/users/create}" 
+                    method="post" 
+                    class="w-25" 
+                    th:object="${user}"
+                    enctype="multipart/form-data"
+                    onsubmit="return checkEmailUnique(this)">
                     <div class="form">
                         <input type="hidden" th:field="*{id}">
                         <div class="mb-3">
@@ -43,6 +49,15 @@
                                 <input type="checkbox" name="enabled" th:checked="*{enabled}" id="enabled" class="btn-check">
                                 <label for="enabled" class="btn btn-outline-secondary">Enable</label>
                             </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userPhoto" class="form-label">Photo</label>
+                            <input type="file" class="form-control" id="userPhoto" name="userPhoto" th:value="*{photos}" accept="image/*">
+                        </div>
+                        <div class="mb-3">
+                            <img th:if="*{photos} == null" id="photoThumbnail" th:src="@{/images/default-user.png}" class="img-thumbnail" alt="User Photo">
+                            <img th:if="*{photos} != null" th:src="@{'/userPhotos/' + *{photos}}" id="photoThumbnail" class="img-thumbnail" alt="User Photo">
+
                         </div>
                         <div class="d-flex justify-content-between">
                             <button type="button" class="btn btn-outline-danger" onclick="redirectToUserIndexPage()">Cancel</button>
@@ -93,6 +108,20 @@
             });
 
             return false;
+        }
+
+        // กำหนด event ที่จะทำงานเมื่อมีการเลือกไฟล์ใน input file
+        document.getElementById("userPhoto").onchange = function(event) {
+            let file = event.target.files[0]; // อ่านไฟล์ที่เลือกจาก input file
+            let reader = new FileReader(); // สร้าง FileReader object โดย FileReader คือ built-in object ใน JavaScript ที่ใช้สำหรับอ่านข้อมูลจากไฟล์
+
+            // กำหนด function ที่จะทำงานเมื่ออ่านไฟล์เสร็จ
+            reader.onload = function(event) {
+                document.getElementById("photoThumbnail").src = event.target.result; // กำหนดค่า src ของ img tag เป็นข้อมูลที่อ่านได้
+            };
+
+            // FileReader จะเริ่มทำงานเมื่อมีการเรียกใช้งานคำสั่ง readAsDataURL และเมื่ออ่านเสร็จจะเรียก function ที่กำหนดใน onload
+            reader.readAsDataURL(file); // อ่านไฟล์เป็น Data URL โดย Data URL คือ URL ที่เก็บข้อมูลของไฟล์เป็น Base64 
         }
     </script>
 </body>

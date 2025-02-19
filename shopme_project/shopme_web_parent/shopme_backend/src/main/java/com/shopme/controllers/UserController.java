@@ -6,14 +6,18 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.shopme.entities.Role;
 import com.shopme.entities.User;
+import com.shopme.services.FileService;
 import com.shopme.services.RoleService;
 import com.shopme.services.UserService;
 
@@ -23,10 +27,12 @@ public class UserController {
 
     private UserService userService;
     private RoleService roleService;
-
-    public UserController(UserService userService, RoleService roleService) {
+    private FileService fileService;
+    
+    public UserController(UserService userService, RoleService roleService, FileService fileService) {
         this.userService = userService;
         this.roleService = roleService;
+        this.fileService = fileService;
     }
 
     // Model เป็น interface ที่ใช้ในการส่งข้อมูลไปยัง view
@@ -55,8 +61,25 @@ public class UserController {
         return "users/user_form";
     }
 
+    // MultiPartFile ใช้ในการรับข้อมูลจาก form ที่มีการ upload file
     @PostMapping("/create")
-    public String createUser(User user, RedirectAttributes redirectAttributes) {
+    public String createUser(User user, RedirectAttributes redirectAttributes, @RequestParam("userPhoto") MultipartFile userPhoto) {
+        // ถ้า userPhoto ไม่ว่างเปล่า
+        if (!userPhoto.isEmpty()) {
+            // ถ้า user มี id แสดงว่าเป็นการ edit user ให้ทำการลบรูปเก่าออก
+            if (user.getId() != null) {
+                User userExist = this.userService.findById(user.getId()).get();
+                String oldPhoto = userExist.getPhotos();
+                this.fileService.remove("userPhotos", oldPhoto);
+            }
+
+            String fileName = StringUtils.cleanPath(userPhoto.getOriginalFilename()); // ใช้ในการดึงชื่อไฟล์จาก MultipartFile โดยที่ cleanPath จะทำการลบ path ที่อาจจะมีอยู่ในชื่อไฟล์ออก
+            String outDir = "userPhotos";
+    
+            this.fileService.save(outDir, fileName, userPhoto);
+            user.setPhotos(fileName);
+        }
+
         this.userService.save(user);
 
         redirectAttributes.addFlashAttribute("message", "The user has been successfully");

@@ -32,7 +32,10 @@
                     <tbody>
                         <tr th:each="user : ${users}" th:object="${user}">
                             <th th:text="*{id}">User ID</th>
-                            <th th:text="*{photos}">Photo</th>
+                            <th>
+                                <span th:if="*{photos} == null">No Photo</span>
+                                <img th:if="*{photos} != null" th:src="@{'/userPhotos/' + *{photos}}" class="img-thumbnail" width="50px" alt="User Photo">
+                            </th>
                             <th th:text="*{firstName}">First Name</th>
                             <th th:text="*{lastName}">Last Name</th>
                             <th th:text="*{email}">Email</th>

@@ -28,17 +28,44 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void save(User user) {
-        String encodedPassword = this.passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
+        boolean isUpdateUser = (user.getId() != null);
+        if (isUpdateUser) {
+            User existingUser = this.userRepo.findById(user.getId()).get();
+
+            if (user.getPassword().isEmpty()) {
+                user.setPassword(existingUser.getPassword());
+            } else {
+                String encodedPassword = this.passwordEncoder.encode(user.getPassword());
+                user.setPassword(encodedPassword);
+            }
+        } else {
+            String encodedPassword = this.passwordEncoder.encode(user.getPassword());
+            user.setPassword(encodedPassword);
+        }
         
+        // save ใช้ในการบันทึกข้อมูลลงใน database 
         this.userRepo.save(user);
     }
 
     @Override
-    public boolean isEmailUnique(String email) {
+    public boolean isEmailUnique(String email, Integer id) {
         Optional<User> userOptional = this.userRepo.findByEmail(email);
 
         // isEmpty() ใช้ในการตรวจสอบว่า Optional นั้นมีค่าว่างหรือไม่ ถ้ามีค่าว่างจะ return true ถ้าไม่มีค่าว่างจะ return false
-        return userOptional.isEmpty(); 
+        if (userOptional.isEmpty()) {
+            return true;
+        }
+
+        User user = userOptional.get();
+        if (user.getId().equals(id)) { // ถ้า id ของ user ที่มีอยู่ใน database ตรงกับ id ที่ส่งมาจาก client ให้ return true
+            return true;
+        }
+
+        return false; 
+    }
+
+    @Override
+    public Optional<User> findById(Integer id) {
+        return this.userRepo.findById(id);
     }
 }

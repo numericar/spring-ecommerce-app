@@ -7,10 +7,11 @@
     <div th:replace="~{commons/navbar :: navbar}"></div>
 
     <div class="container-fluid">
-            <h2 class="text-center">Create user</h2>
+            <h2 class="text-center" th:text="${pageTitle}"></h2>
             <div class="d-flex justify-content-center align-items-center w-100">
                 <form th:action="@{/users/create}" method="post" class="w-25" th:object="${user}" onsubmit="return checkEmailUnique(this)">
                     <div class="form">
+                        <input type="hidden" th:field="*{id}">
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" id="email" class="form-control w-100" th:field="*{email}" required minlength="8" maxlength="128">
@@ -25,12 +26,14 @@
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" id="password" class="form-control w-100" th:field="*{password}" required>
+                            <input th:if="${user.id == null}" type="password" id="password" class="form-control w-100" th:field="*{password}" required>
+                            <input th:if="${user.id != null}" type="password" id="password" class="form-control w-100" th:field="*{password}">
+
                         </div>
                         <div class="mb-3">
                             <div class="btn-group" role="group">
                                 <th:block th:each="role : ${roles}">
-                                    <input type="checkbox" name="roles" th:value="${role.id}" class="btn-check" th:id="'role-' + ${role.id}" th:checked="${#lists.contains(user.roles, role.id)}" autocomplete="off">
+                                    <input type="checkbox" name="roles" th:value="${role.id}" class="btn-check" th:id="'role-' + ${role.id}" th:checked="${#lists.contains(user.roles, role)}" autocomplete="off">
                                     <label th:text="${role.name}" class="btn btn-outline-secondary" th:for="'role-' + ${role.id}"></label>
                                 </th:block>
                             </div>
@@ -62,7 +65,8 @@
         function checkEmailUnique(form) {
             let email = document.getElementById("email").value;
             let csrf = document.getElementsByName("_csrf")[0].value; // อ่าน token จาก input hidden ที่ชื่อ _csrf
-            let url = "[[@{/api/users/check_email_unique}]]?email=" + email;
+            let userId = document.getElementById("id").value;
+            let url = "[[@{/api/users/check_email_unique}]]?email=" + email + "&id=" + userId;
 
             fetch(url, {
                 method: "post",

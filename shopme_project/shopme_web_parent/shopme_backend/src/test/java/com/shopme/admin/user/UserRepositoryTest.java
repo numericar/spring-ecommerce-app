@@ -2,6 +2,8 @@ package com.shopme.admin.user;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -81,5 +83,14 @@ public class UserRepositoryTest {
 
         User userSaved = this.repo.save(user);
         assertTrue(userSaved.getRoles().size() == 1);
+    }
+
+    @Test
+    public void testGetUserByEmail() {
+        String email = "root@gmail.com";
+
+        Optional<User> userOptinal = this.repo.findByEmail(email);
+
+        assertTrue(userOptinal.isPresent()); // ตรวจสอบว่ามีข้อมูลหรือไม่ ถ้ามีจะ return true
     }
 }

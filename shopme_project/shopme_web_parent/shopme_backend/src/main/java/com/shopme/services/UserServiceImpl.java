@@ -1,6 +1,7 @@
 package com.shopme.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,5 +32,13 @@ public class UserServiceImpl implements UserService {
         user.setPassword(encodedPassword);
         
         this.userRepo.save(user);
+    }
+
+    @Override
+    public boolean isEmailUnique(String email) {
+        Optional<User> userOptional = this.userRepo.findByEmail(email);
+
+        // isEmpty() ใช้ในการตรวจสอบว่า Optional นั้นมีค่าว่างหรือไม่ ถ้ามีค่าว่างจะ return true ถ้าไม่มีค่าว่างจะ return false
+        return userOptional.isEmpty(); 
     }
 }

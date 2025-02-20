@@ -3,6 +3,9 @@ package com.shopme.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +17,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
+    public static final int SIZE = 5;
 
     public UserServiceImpl(UserRepository userRepo, PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
@@ -78,5 +82,14 @@ public class UserServiceImpl implements UserService {
         }
 
         this.userRepo.deleteById(id);
+    }
+
+    @Override
+    public Page<User> findAll(int page) {
+        // Pageable คือ interface ที่ใช้ในการทำการ paginate ข้อมูล
+        // PageRequest คือ class ที่ใช้ในการสร้าง instance ของ Pageable
+        Pageable pageable = PageRequest.of(page, SIZE);
+
+        return this.userRepo.findAll(pageable);
     }
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -38,10 +39,44 @@ public class UserController {
     // Model เป็น interface ที่ใช้ในการส่งข้อมูลไปยัง view
     @GetMapping
     public String viewIndexPage(Model model) {
-        List<User> users = userService.findAll();
+        // List<User> users = userService.findAll();
 
         // addAttribute() ใช้ในการส่งข้อมูลไปยัง view โดยที่ข้อมูลที่ส่งไปจะถูกเก็บไว้ใน
         // model ซึ่งเป็นตัวแปรที่ใช้ในการเก็บข้อมูลที่จะส่งไปยัง view
+        // model.addAttribute("users", users);
+
+        Page<User> page = userService.findAll(0);
+        List<User> users = page.getContent();
+
+        model.addAttribute("users", users);
+
+        return "users/index";
+    }
+
+    @GetMapping("/page/{pageNumber}")
+    public String viewPaginatedPage(@PathVariable("pageNumber") int pageNumber, Model model) {
+        if (pageNumber < 1) {
+            return "redirect:/users/pages/1";
+        }
+
+        pageNumber -= 1;
+
+        Page<User> page = userService.findAll(pageNumber);
+        List<User> users = page.getContent();
+
+        // หา startCount โดยการหาหน้าปัจจุบันคูณกับขนาดข้อมูลที่ต้องการแสดง
+        // startCount จะใช้ในการแสดงข้อมูลว่าเริ่มที่ข้อมูลที่เท่าไหร่
+        long startCount = pageNumber * UserService.SIZE + 1; // หาว่าเริ่มที่ข้อมูลที่เท่าไหร่
+        long endCount = startCount + UserService.SIZE - 1; // 
+        if (endCount > page.getTotalElements()) {
+            endCount = page.getTotalElements();
+        }
+        
+        model.addAttribute("startCount", startCount); // ข้อมูลเริ่มต้น
+        model.addAttribute("endCount", endCount); // ข้อมูลสุดท้าย
+        model.addAttribute("totalItems", page.getTotalElements()); // จำนวนข้อมูลทั้งหมด
+        model.addAttribute("totalPages", page.getTotalPages()); // จำนวนหน้าทั้งหมด
+        model.addAttribute("currentPage", pageNumber + 1); // หน้าปัจจุบัน
         model.addAttribute("users", users);
 
         return "users/index";

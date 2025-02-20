@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{commons/head :: head}"></head>
+
 <body>
     <div>
         <!-- Header -->
         <div th:replace="~{commons/navbar :: navbar}"></div>
 
         <!-- content -->
-         <div class="container-fluid">
+        <div class="container-fluid">
             <div>
                 <h2>Manage User</h2>
                 <a th:href="@{/users/create}">Create user</a>
@@ -34,7 +36,8 @@
                             <th th:text="*{id}">User ID</th>
                             <th>
                                 <span th:if="*{photos} == null">No Photo</span>
-                                <img th:if="*{photos} != null" th:src="@{'/userPhotos/' + *{photos}}" class="img-thumbnail" width="50px" alt="User Photo">
+                                <img th:if="*{photos} != null" th:src="@{'/userPhotos/' + *{photos}}"
+                                    class="img-thumbnail" width="50px" alt="User Photo">
                             </th>
                             <th th:text="*{firstName}">First Name</th>
                             <th th:text="*{lastName}">Last Name</th>
@@ -49,12 +52,40 @@
                     </tbody>
                 </table>
             </div>
-         </div>
+            <div class="text-center">
+                <span class="mb-3">Showing user [[${startCount}]] to [[${endCount}]] of [[${totalItems}]]</span>
+                <nav class="d-flex justify-content-center">
+                    <ul class="pagination">
+                        <li th:class="${currentPage == 1} ? 'page-item disabled' : 'page-item'">
+                            <a class="page-link" th:href="@{/users/page/1}">First</a>
+                        </li>
+                        <li th:class="${currentPage == 1} ? 'page-item disabled' : 'page-item'">
+                            <a class="page-link" th:href="@{'/users/page/' + ${currentPage - 1}}">Previous</a>
+                        </li>
+                        <!-- #numbers.sequence ใช้ในการสร้างลูป โดยจะสร้างลูปตามจำนวนที่กำหนด -->
+                        <li th:class="${currentPage != i ? 'page-item' : 'page-item active'} " th:each="i : ${#numbers.sequence(1, totalPages)}">
+                            <a class="page-link" th:href="@{'/users/page/' + ${i}}" th:text="${i}"></a>
+                        </li>
+                        <li th:class="${currentPage == totalPages} ? 'page-item disabled' : 'page-item'">
+                            <a class="page-link" th:href="@{'/users/page/' + ${currentPage + 1}}">Next</a>
+                        </li>
+                        <li th:class="${currentPage == totalPages} ? 'page-item disabled' : 'page-item'">
+                            <a class="page-link" th:href="@{'/users/page/' + ${totalPages}}">Last</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
 
         <!-- footer -->
-        <div class="container-fluid">
+        <div class="container-fluid" th:if="${totalItems} > 0">
             <p>Shopme Control Panel - Copyright &copy; Shopme</p>
+        </div>
+        <div th:if="${totalItems} == 0">
+            <p>No users found</p>
+
         </div>
     </div>
 </body>
+
 </html>

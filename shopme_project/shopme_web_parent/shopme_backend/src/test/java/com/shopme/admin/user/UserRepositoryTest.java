@@ -2,6 +2,7 @@ package com.shopme.admin.user;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -10,13 +11,16 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.Rollback;
 
 import com.shopme.entities.Role;
 import com.shopme.entities.User;
 import com.shopme.repositories.UserRepository;
 
-@DataJpaTest
+@DataJpaTest(showSql = false)
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @Rollback(false)
 public class UserRepositoryTest {
@@ -100,5 +104,28 @@ public class UserRepositoryTest {
         Long countById = this.repo.countById(id);
 
         assertTrue(countById == 1);
+    }
+
+    @Test
+    public void testListFirstPage() {
+        int pageNumber = 0;
+        int pageSize = 5;
+
+        // Pageable ใช้สำหรับการทำ pagination ในการดึงข้อมูลจาก database
+        // PageRequest ใช้สำหรับการสร้าง Pageable object
+        // of() ใช้สำหรับการสร้าง Pageable object โดยที่จะรับ parameter 2 ตัวคือ pageNumber และ pageSize
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        // Page ใช้สำหรับการเก็บข้อมูลที่ได้จากการทำ pagination
+        Page<User> page = this.repo.findAll(pageable);
+        
+        // getContent() ใช้สำหรับการดึงข้อมูลที่ได้จากการทำ pagination
+        List<User> users = page.getContent();
+
+        for (User user : users) {
+            System.out.println(user.toString());
+        }
+
+        assertTrue(users.size() <= pageSize && users.size() > 0);
     }
 }

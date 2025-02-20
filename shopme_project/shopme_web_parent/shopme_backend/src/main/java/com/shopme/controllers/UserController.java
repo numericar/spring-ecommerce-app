@@ -45,7 +45,9 @@ public class UserController {
         // model ซึ่งเป็นตัวแปรที่ใช้ในการเก็บข้อมูลที่จะส่งไปยัง view
         // model.addAttribute("users", users);
 
-        Page<User> page = userService.findAll(0);
+        Optional<String> sortFieldOptional = Optional.empty();
+        Optional<String> sortDirOptional = Optional.empty();
+        Page<User> page = userService.findAll(0, sortFieldOptional, sortDirOptional);
         List<User> users = page.getContent();
 
         model.addAttribute("users", users);
@@ -54,14 +56,18 @@ public class UserController {
     }
 
     @GetMapping("/page/{pageNumber}")
-    public String viewPaginatedPage(@PathVariable("pageNumber") int pageNumber, Model model) {
+    public String viewPaginatedPage(
+        @PathVariable("pageNumber") int pageNumber,
+        @RequestParam(name = "sortField", required = false) Optional<String> sortField,
+        @RequestParam(name = "sortDir", required = false) Optional<String> sortDir,
+        Model model) {
         if (pageNumber < 1) {
             return "redirect:/users/pages/1";
         }
 
         pageNumber -= 1;
 
-        Page<User> page = userService.findAll(pageNumber);
+        Page<User> page = userService.findAll(pageNumber, sortField, sortDir);
         List<User> users = page.getContent();
 
         // หา startCount โดยการหาหน้าปัจจุบันคูณกับขนาดข้อมูลที่ต้องการแสดง
@@ -78,6 +84,8 @@ public class UserController {
         model.addAttribute("totalPages", page.getTotalPages()); // จำนวนหน้าทั้งหมด
         model.addAttribute("currentPage", pageNumber + 1); // หน้าปัจจุบัน
         model.addAttribute("users", users);
+        model.addAttribute("sortField", sortField.orElse(null));
+        model.addAttribute("sortDir", sortDir.orElse("asc"));
 
         return "users/index";
     }

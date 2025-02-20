@@ -23,7 +23,10 @@
                         <tr>
                             <th>User ID</th>
                             <th>Photo</th>
-                            <th>First Name</th>
+                            <th>
+                                <a th:if="${sortField != 'firstName'}" th:href="@{'/users/page/' + ${currentPage} + '?sortField=firstName&sortDir=' + ${sortDir}}">First Name</a>
+                                <!-- <span th:if="${sortField == 'firstName'}" th:class="${sirtDir == 'asc'}"></span> -->
+                            </th>
                             <th>Last Name</th>
                             <th>Email</th>
                             <th>Roles</th>

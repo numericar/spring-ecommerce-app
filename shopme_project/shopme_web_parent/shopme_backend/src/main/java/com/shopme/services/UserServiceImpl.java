@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -89,6 +90,31 @@ public class UserServiceImpl implements UserService {
         // Pageable คือ interface ที่ใช้ในการทำการ paginate ข้อมูล
         // PageRequest คือ class ที่ใช้ในการสร้าง instance ของ Pageable
         Pageable pageable = PageRequest.of(page, SIZE);
+
+        return this.userRepo.findAll(pageable);
+    }
+
+    @Override
+    public Page<User> findAll(int page, Optional<String> sortFieldOptional, Optional<String> sortDirOptional) {
+        String sortField = "id";
+        if (!sortFieldOptional.isPresent()) {
+            sortField = sortFieldOptional.get();
+        }
+
+        // Sort คือ class ที่ใช้ในการ sort ข้อมูล
+        // Sort.by() ใช้ในการสร้าง instance ของ Sort
+        Sort sort = Sort.by(sortField); // ใช้ในการ sort ข้อมูลโดยที่ sortField คือ field ที่ต้องการให้ sort
+
+        // ascending คือ เรียงจาก น้อยไปมาก
+        // descending คือ เรียงจาก มากไปน้อย
+        // Optional ใช้ในการ handle ค่าที่อาจจะเป็น null หรือไม่มีค่า
+        if (sortDirOptional.isPresent() && sortDirOptional.get().equals("desc")) {
+            sort = sort.descending();
+        } else {
+            sort = sort.ascending();
+        }
+
+        Pageable pageable = PageRequest.of(page, SIZE, sort); // ใช้ในการสร้าง instance ของ Pageable โดยที่ sort ข้อมูลด้วย sort ที่กำหนดไว้
 
         return this.userRepo.findAll(pageable);
     }

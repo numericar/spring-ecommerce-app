@@ -14,6 +14,9 @@
                 <h2>Manage User</h2>
                 <a th:href="@{/users/create}">Create user</a>
             </div>
+            <div>
+                <a th:href="@{/users/exports/csv}">export to csv</a>
+            </div>
             <div th:if="${message != null}">
                 <p th:text="${message}" class="alert alert-success text-center"></p>
             </div>

@@ -1,5 +1,6 @@
 package com.shopme.controllers;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -20,7 +21,10 @@ import com.shopme.entities.Role;
 import com.shopme.entities.User;
 import com.shopme.services.FileService;
 import com.shopme.services.RoleService;
+import com.shopme.services.UserCsvExporter;
 import com.shopme.services.UserService;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/users")
@@ -29,11 +33,14 @@ public class UserController {
     private UserService userService;
     private RoleService roleService;
     private FileService fileService;
-    
-    public UserController(UserService userService, RoleService roleService, FileService fileService) {
+    private UserCsvExporter userCsvExporter;
+
+    public UserController(UserService userService, RoleService roleService, FileService fileService,
+            UserCsvExporter userCsvExporter) {
         this.userService = userService;
         this.roleService = roleService;
         this.fileService = fileService;
+        this.userCsvExporter = userCsvExporter;
     }
 
     // Model เป็น interface ที่ใช้ในการส่งข้อมูลไปยัง view
@@ -58,11 +65,11 @@ public class UserController {
 
     @GetMapping("/page/{pageNumber}")
     public String viewPaginatedPage(
-        @PathVariable("pageNumber") int pageNumber,
-        @RequestParam(name = "sortField", required = false) Optional<String> sortField,
-        @RequestParam(name = "sortDir", required = false) Optional<String> sortDir,
-        @RequestParam(name = "keyword", required = false) Optional<String> keyword,
-        Model model) {
+            @PathVariable("pageNumber") int pageNumber,
+            @RequestParam(name = "sortField", required = false) Optional<String> sortField,
+            @RequestParam(name = "sortDir", required = false) Optional<String> sortDir,
+            @RequestParam(name = "keyword", required = false) Optional<String> keyword,
+            Model model) {
         if (pageNumber < 1) {
             return "redirect:/users/pages/1";
         }
@@ -75,11 +82,11 @@ public class UserController {
         // หา startCount โดยการหาหน้าปัจจุบันคูณกับขนาดข้อมูลที่ต้องการแสดง
         // startCount จะใช้ในการแสดงข้อมูลว่าเริ่มที่ข้อมูลที่เท่าไหร่
         long startCount = pageNumber * UserService.SIZE + 1; // หาว่าเริ่มที่ข้อมูลที่เท่าไหร่
-        long endCount = startCount + UserService.SIZE - 1; // 
+        long endCount = startCount + UserService.SIZE - 1; //
         if (endCount > page.getTotalElements()) {
             endCount = page.getTotalElements();
         }
-        
+
         model.addAttribute("startCount", startCount); // ข้อมูลเริ่มต้น
         model.addAttribute("endCount", endCount); // ข้อมูลสุดท้าย
         model.addAttribute("totalItems", page.getTotalElements()); // จำนวนข้อมูลทั้งหมด
@@ -109,7 +116,8 @@ public class UserController {
 
     // MultiPartFile ใช้ในการรับข้อมูลจาก form ที่มีการ upload file
     @PostMapping("/create")
-    public String createUser(User user, RedirectAttributes redirectAttributes, @RequestParam("userPhoto") MultipartFile userPhoto) {
+    public String createUser(User user, RedirectAttributes redirectAttributes,
+            @RequestParam("userPhoto") MultipartFile userPhoto) {
         // ถ้า userPhoto ไม่ว่างเปล่า
         if (!userPhoto.isEmpty()) {
             // ถ้า user มี id แสดงว่าเป็นการ edit user ให้ทำการลบรูปเก่าออก
@@ -119,9 +127,12 @@ public class UserController {
                 this.fileService.remove("userPhotos", oldPhoto);
             }
 
-            String fileName = StringUtils.cleanPath(userPhoto.getOriginalFilename()); // ใช้ในการดึงชื่อไฟล์จาก MultipartFile โดยที่ cleanPath จะทำการลบ path ที่อาจจะมีอยู่ในชื่อไฟล์ออก
+            String fileName = StringUtils.cleanPath(userPhoto.getOriginalFilename()); // ใช้ในการดึงชื่อไฟล์จาก
+                                                                                      // MultipartFile โดยที่ cleanPath
+                                                                                      // จะทำการลบ path
+                                                                                      // ที่อาจจะมีอยู่ในชื่อไฟล์ออก
             String outDir = "userPhotos";
-    
+
             this.fileService.save(outDir, fileName, userPhoto);
             user.setPhotos(fileName);
         }
@@ -139,7 +150,8 @@ public class UserController {
             Optional<User> userOptional = this.userService.findById(id);
 
             if (userOptional.isEmpty()) {
-                // NoSuchElementException ใช้ในการ handle exception ที่เกิดขึ้นเมื่อไม่พบข้อมูลที่ต้องการ
+                // NoSuchElementException ใช้ในการ handle exception
+                // ที่เกิดขึ้นเมื่อไม่พบข้อมูลที่ต้องการ
                 throw new NoSuchElementException("Could not find any user with ID " + id);
             }
 
@@ -175,5 +187,15 @@ public class UserController {
         redirectAttributes.addFlashAttribute("message", "The user has been deleted successfully");
 
         return "redirect:/users";
+    }
+
+    @GetMapping("/exports/csv")
+    public void exportToCSV(HttpServletResponse response) {
+        List<User> listUsers = this.userService.findAll();
+        try {
+            this.userCsvExporter.export(listUsers, response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

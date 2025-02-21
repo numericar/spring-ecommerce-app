@@ -47,7 +47,8 @@ public class UserController {
 
         Optional<String> sortFieldOptional = Optional.empty();
         Optional<String> sortDirOptional = Optional.empty();
-        Page<User> page = userService.findAll(0, sortFieldOptional, sortDirOptional);
+        Optional<String> keywordOptional = Optional.empty();
+        Page<User> page = userService.findAll(0, sortFieldOptional, sortDirOptional, keywordOptional);
         List<User> users = page.getContent();
 
         model.addAttribute("users", users);
@@ -60,6 +61,7 @@ public class UserController {
         @PathVariable("pageNumber") int pageNumber,
         @RequestParam(name = "sortField", required = false) Optional<String> sortField,
         @RequestParam(name = "sortDir", required = false) Optional<String> sortDir,
+        @RequestParam(name = "keyword", required = false) Optional<String> keyword,
         Model model) {
         if (pageNumber < 1) {
             return "redirect:/users/pages/1";
@@ -67,7 +69,7 @@ public class UserController {
 
         pageNumber -= 1;
 
-        Page<User> page = userService.findAll(pageNumber, sortField, sortDir);
+        Page<User> page = userService.findAll(pageNumber, sortField, sortDir, keyword);
         List<User> users = page.getContent();
 
         // หา startCount โดยการหาหน้าปัจจุบันคูณกับขนาดข้อมูลที่ต้องการแสดง
@@ -86,6 +88,7 @@ public class UserController {
         model.addAttribute("users", users);
         model.addAttribute("sortField", sortField.orElse(null));
         model.addAttribute("sortDir", sortDir.orElse("asc"));
+        model.addAttribute("keyword", keyword.orElse(null));
 
         return "users/index";
     }

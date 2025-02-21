@@ -95,9 +95,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> findAll(int page, Optional<String> sortFieldOptional, Optional<String> sortDirOptional) {
+    public Page<User> findAll(int page, Optional<String> sortFieldOptional, Optional<String> sortDirOptional, Optional<String> keyword) {
         String sortField = "id";
-        if (!sortFieldOptional.isPresent()) {
+        if (sortFieldOptional.isPresent()) {
             sortField = sortFieldOptional.get();
         }
 
@@ -115,6 +115,10 @@ public class UserServiceImpl implements UserService {
         }
 
         Pageable pageable = PageRequest.of(page, SIZE, sort); // ใช้ในการสร้าง instance ของ Pageable โดยที่ sort ข้อมูลด้วย sort ที่กำหนดไว้
+
+        if (keyword.isPresent()) {
+            return this.userRepo.findAll(keyword.get(), pageable);
+        }
 
         return this.userRepo.findAll(pageable);
     }

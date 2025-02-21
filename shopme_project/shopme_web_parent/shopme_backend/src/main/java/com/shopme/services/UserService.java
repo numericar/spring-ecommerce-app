@@ -12,7 +12,7 @@ public interface UserService {
     
     List<User> findAll();
     Page<User> findAll(int page);
-    Page<User> findAll(int page, Optional<String> sortField, Optional<String> sortDir);
+    Page<User> findAll(int page, Optional<String> sortField, Optional<String> sortDir, Optional<String> keyword);
     void save(User user);
     boolean isEmailUnique(String email, Integer id);
     Optional<User> findById(Integer id);

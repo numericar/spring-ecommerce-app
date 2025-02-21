@@ -128,4 +128,21 @@ public class UserRepositoryTest {
 
         assertTrue(users.size() <= pageSize && users.size() > 0);
     }
+
+    @Test 
+    public void testSearchUsers() {
+        String keyword = "user01";
+
+        int pageNumber = 0;
+        int pageSize = 4;
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<User> page = this.repo.findAll(keyword, pageable);
+
+        List<User> users = page.getContent();
+
+        users.forEach(user -> System.out.println(user));
+
+        assertTrue(users.size() > 0);
+    }
 }

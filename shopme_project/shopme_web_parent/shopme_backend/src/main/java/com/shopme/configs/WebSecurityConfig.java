@@ -52,6 +52,8 @@ public class WebSecurityConfig {
             form.loginProcessingUrl("/auths/login"); // กำหนดว่า URL ไหนที่จะใช้ในการ login
             form.failureUrl("/auths/login?error"); // กำหนดว่า URL ไหนที่จะใช้ในกรณีที่ login ไม่สำเร็จ
             form.defaultSuccessUrl("/"); // กำหนดว่า URL ไหนที่จะใช้ในกรณีที่ login สำเร็จ
+            form.usernameParameter("email"); // กำหนดชื่อของข้อมูลที่ใช้เป็น username
+            form.passwordParameter("password"); // กำหนดชื่อของข้อมูลที่ใช้เป็น password
             form.permitAll(); // กำหนดว่า URL ไหนที่จะไม่ต้อง login ก็สามารถเข้าถึงได้
         });
 

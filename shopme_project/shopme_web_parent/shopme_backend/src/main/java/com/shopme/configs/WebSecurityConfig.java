@@ -1,5 +1,7 @@
 package com.shopme.configs;
 
+import java.util.stream.Stream;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,11 +20,41 @@ public class WebSecurityConfig {
      *      การกำหนดว่า URL ไหนที่จะต้องมีการ login ก่อนถึงจะเข้าถึงได้ หรือการกำหนดว่า URL ไหนที่จะไม่ต้อง login ก็สามารถเข้าถึงได้
      */
 
-    @Bean // ใช้ในการบอกว่า method นี้จะ return object ที่จะถูกจัดเก็บไว้ใน Spring container
-    SecurityFilterChain configureHttpSecurity(HttpSecurity http) throws Exception {
+    // @Bean // ใช้ในการบอกว่า method นี้จะ return object ที่จะถูกจัดเก็บไว้ใน Spring container
+    // SecurityFilterChain configureHttpSecurity(HttpSecurity http) throws Exception {
         
-        http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+    //     http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
         
+    //     return http.build();
+    // }
+
+    @Bean 
+    SecurityFilterChain configure(HttpSecurity http) throws Exception {
+        // http.authorizeHttpRequests(auth -> {
+        //     auth
+        //         .anyRequest() // กำหนดว่า URL ไหนที่จะต้องมีการ login ก่อนถึงจะเข้าถึงได้ ในที่นี้คือทุก URL
+        //         .authenticated(); // กำหนดว่า URL ไหนที่จะต้องมีการ login ก่อนถึงจะเข้าถึงได้
+        // });
+
+        String[] resourceUrl = { "/css/**", "/js/**", "/images/**", "/webjars/bootstrap/**" };
+        String[] privateUrl = { "/users/**" };
+        String[] publicUrl = { "/auths/**" };
+
+        // Stream คือ 
+        String[] combinedPublicUrl = Stream.concat(Stream.of(resourceUrl), Stream.of(publicUrl)).toArray(String[]::new);
+
+        http.authorizeHttpRequests(auth -> auth.requestMatchers(privateUrl).authenticated()); // กำหนดว่า URL ไหนที่จะต้องมีการ login ก่อนถึงจะเข้าถึงได้ ในที่นี้คือทุก URL
+        http.authorizeHttpRequests(auth -> auth.requestMatchers(combinedPublicUrl).permitAll()); // กำหนดว่า URL ไหนที่จะไม่ต้อง login ก็สามารถเข้าถึงได้
+
+        // ตั้งค่าการ login
+        http.formLogin(form -> {
+            form.loginPage("/auths/login"); // กำหนดว่า URL ไหนที่จะใช้ในการ login
+            form.loginProcessingUrl("/auths/login"); // กำหนดว่า URL ไหนที่จะใช้ในการ login
+            form.failureUrl("/auths/login?error"); // กำหนดว่า URL ไหนที่จะใช้ในกรณีที่ login ไม่สำเร็จ
+            form.defaultSuccessUrl("/"); // กำหนดว่า URL ไหนที่จะใช้ในกรณีที่ login สำเร็จ
+            form.permitAll(); // กำหนดว่า URL ไหนที่จะไม่ต้อง login ก็สามารถเข้าถึงได้
+        });
+
         return http.build();
     }
 

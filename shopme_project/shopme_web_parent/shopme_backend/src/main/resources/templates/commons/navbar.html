@@ -40,7 +40,17 @@
                         <a class="nav-link" th:href="@{/menus}">Menus</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/settings}">Settingssss</a>
+                        <a class="nav-link" th:href="@{/settings}">Settings</a>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link" sec:authorize="isAuthenticated()">
+                            <span sec:authentication="name"></span>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link" sec:authorize="isAuthenticated()">
+                            <a th:href="">logout</a>
+                        </span>
                     </li>
                 </ul>
             </div>

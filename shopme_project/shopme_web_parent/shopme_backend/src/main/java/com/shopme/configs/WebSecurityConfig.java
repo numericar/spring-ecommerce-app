@@ -41,7 +41,7 @@ public class WebSecurityConfig {
         // });
 
         String[] resourceUrl = { "/css/**", "/js/**", "/images/**", "/webjars/bootstrap/**" };
-        String[] privateUrl = { "/users/**", "/api/users/**" };
+        String[] privateUrl = { "/users/**", "/api/users/**", "/" };
         String[] publicUrl = { "/auths/**" };
 
         // Stream คือ 
@@ -63,7 +63,7 @@ public class WebSecurityConfig {
             form.usernameParameter("email"); // กำหนดชื่อของข้อมูลที่ใช้เป็น username
             form.passwordParameter("password"); // กำหนดชื่อของข้อมูลที่ใช้เป็น password
             form.permitAll(); // กำหนดว่า URL ไหนที่จะไม่ต้อง login ก็สามารถเข้าถึงได้
-        });
+        }).logout(logout -> logout.logoutUrl("/auths/logout").permitAll());
 
         return http.build();
     }

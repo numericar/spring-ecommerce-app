@@ -52,15 +52,15 @@ public class UserController {
         // model ซึ่งเป็นตัวแปรที่ใช้ในการเก็บข้อมูลที่จะส่งไปยัง view
         // model.addAttribute("users", users);
 
-        Optional<String> sortFieldOptional = Optional.empty();
-        Optional<String> sortDirOptional = Optional.empty();
-        Optional<String> keywordOptional = Optional.empty();
-        Page<User> page = userService.findAll(0, sortFieldOptional, sortDirOptional, keywordOptional);
-        List<User> users = page.getContent();
+        // Optional<String> sortFieldOptional = Optional.empty();
+        // Optional<String> sortDirOptional = Optional.empty();
+        // Optional<String> keywordOptional = Optional.empty();
+        // Page<User> page = userService.findAll(0, sortFieldOptional, sortDirOptional, keywordOptional);
+        // List<User> users = page.getContent();
 
-        model.addAttribute("users", users);
+        // model.addAttribute("users", users);
 
-        return "users/index";
+        return "redirect:/users/page/1";
     }
 
     @GetMapping("/page/{pageNumber}")

@@ -4,8 +4,12 @@ import java.util.stream.Stream;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -37,14 +41,18 @@ public class WebSecurityConfig {
         // });
 
         String[] resourceUrl = { "/css/**", "/js/**", "/images/**", "/webjars/bootstrap/**" };
-        String[] privateUrl = { "/users/**" };
+        String[] privateUrl = { "/users/**", "/api/users/**" };
         String[] publicUrl = { "/auths/**" };
 
         // Stream คือ 
         String[] combinedPublicUrl = Stream.concat(Stream.of(resourceUrl), Stream.of(publicUrl)).toArray(String[]::new);
 
-        http.authorizeHttpRequests(auth -> auth.requestMatchers(privateUrl).authenticated()); // กำหนดว่า URL ไหนที่จะต้องมีการ login ก่อนถึงจะเข้าถึงได้ ในที่นี้คือทุก URL
-        http.authorizeHttpRequests(auth -> auth.requestMatchers(combinedPublicUrl).permitAll()); // กำหนดว่า URL ไหนที่จะไม่ต้อง login ก็สามารถเข้าถึงได้
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers(combinedPublicUrl).permitAll() // กำหนดว่า URL ไหนที่จะไม่ต้อง login ก็สามารถเข้าถึงได้
+                .requestMatchers(privateUrl).authenticated() // กำหนดว่า URL ไหนที่จะต้องมีการ login ก่อนถึงจะเข้าถึงได้ ในที่นี้คือทุก URL
+                // .anyRequest().denyAll()
+            );
+
 
         // ตั้งค่าการ login
         http.formLogin(form -> {
@@ -60,10 +68,30 @@ public class WebSecurityConfig {
         return http.build();
     }
 
+    @Bean
+    public AuthenticationManager authenticationManager() throws Exception {
+        return new ProviderManager(this.authenticationProvider());
+    }
+
     // คือ method ที่ใช้ในการ return object ที่ใช้ในการ encode รหัสผ่าน
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new ShopmeUserDetailsService();
+    }
+
+    // ทำหน้าที่จัดเก็บขั้นตอนการตรวจสอบการยืนยันตัวตนผ่าน Authentication ที่ถูกส่งมาให้
+    @Bean 
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+
+        authenticationProvider.setUserDetailsService(this.userDetailsService());
+        authenticationProvider.setPasswordEncoder(this.passwordEncoder());
+
+        return authenticationProvider;
+    }
 }

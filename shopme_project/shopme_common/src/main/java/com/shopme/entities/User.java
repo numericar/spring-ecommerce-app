@@ -5,6 +5,7 @@ import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -40,7 +41,7 @@ public class User {
     @Column(name = "user_enabled")
     private boolean enabled;
 
-    @ManyToMany // สำหรับ join table ระหว่าง users กับ roles ในรูปแบบ many-to-many
+    @ManyToMany(fetch = FetchType.EAGER) // สำหรับ join table ระหว่าง users กับ roles ในรูปแบบ many-to-many
     @JoinTable( // กำหนดชื่อของ join table และชื่อของคอลัมน์ที่เป็น foreign key ของทั้ง 2 ตาราง
         name = "users_roles", // ชื่อของ join table
         joinColumns = @JoinColumn(name = "user_id"), // ชื่อของคอลัมน์ที่เป็น foreign key ของตาราง users 

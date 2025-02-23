@@ -24,6 +24,7 @@ public class ShopmeUserDetail implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<Role> roles = this.user.getRoles();
+        roles.forEach((r) -> System.out.println(r.getName()));
 
         // SimpleGrantedAuthority เป็นคลาสใน Spring Security ใช้สำหรับจัดเก็บข้อมูลเกี่ยวกับสิทธิ์ของผู้ใช้
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();

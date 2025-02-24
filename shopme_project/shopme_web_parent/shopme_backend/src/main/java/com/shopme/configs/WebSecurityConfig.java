@@ -65,6 +65,12 @@ public class WebSecurityConfig {
             form.permitAll(); // กำหนดว่า URL ไหนที่จะไม่ต้อง login ก็สามารถเข้าถึงได้
         }).logout(logout -> logout.logoutUrl("/auths/logout").permitAll());
 
+        http.rememberMe(rememberMe -> {
+            rememberMe.key("6<~3aAj9Mvz+");
+            rememberMe.tokenValiditySeconds(86499);
+            rememberMe.userDetailsService(this.userDetailsService());
+        });
+
         return http.build();
     }
 
